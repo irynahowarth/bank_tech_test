@@ -43,7 +43,7 @@ describe Account do
       transaction = {
         type: 'credit',
         amount: amount_credited,
-        date: DateTime.new,
+        date: Time.now.strftime("%x %H:%m"),
         balance: account.balance
       }
       expect(account.transactions).to eq([transaction])
@@ -55,10 +55,39 @@ describe Account do
       transaction = {
         type: 'debit',
         amount: amount_debited,
-        date: DateTime.new,
+        date: Time.now.strftime("%x %H:%m"),
         balance: account1000.balance
       }
       expect(account1000.transactions).to eq([transaction])
+    end
+
+  end
+
+  context '#print_statement' do
+
+    it 'prints empty statement if there were no transactions' do
+      statement = "date || credit || debit || balance"
+      expect(account.print_statement).to eq(statement)
+    end
+
+    it 'prints current account statement after transaction' do
+      amount_credited = 500
+      account.make_deposit(amount_credited)
+      statement = "date || credit || debit || balance\n"
+      statement += "#{Time.now.strftime("%x %H:%m")} || "
+      statement += "#{sprintf('%.2f', amount_credited)} || "
+      statement += " || "
+      statement += "#{sprintf('%.2f', account.balance)}"
+      expect(account.print_statement).to eq(statement)
+    end
+
+    it 'prints current account statement in descending order' do
+      account.make_deposit(2000)
+      account.make_withdraw(500)
+      statement = "date || credit || debit || balance\n"
+      statement+="#{Time.now.strftime("%x %H:%m")} ||  || 500.00 || 1500.00\\n"
+      statement+="#{Time.now.strftime("%x %H:%m")} || 2000.00 ||  || 2000.00"
+      expect(account.print_statement).to eq(statement)
     end
 
   end
