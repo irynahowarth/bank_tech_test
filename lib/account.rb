@@ -16,10 +16,9 @@ class Account
     create_transaction(:debit, amount, action_name = Transaction)
   end
 
-  def print_statement
-    headers = "date || credit || debit || balance"
-    return headers if @transactions.empty?
-    headers+"\n"+statement_body_output
+  def print_statement(class_name = Statement)
+    statement = class_name.new(transactions)
+    statement.print
   end
 
   private
@@ -33,22 +32,6 @@ class Account
 
   def record_transaction(transaction)
     @transactions.insert(0,transaction)
-  end
-
-  def statement_body_output
-    statement_body = []
-    @transactions.map do |item|
-      statement  = "#{item[:date]} || "
-      statement += "#{money_format(item[:amount]) if item[:type]=='credit'} || "
-      statement += "#{money_format(item[:amount]) if item[:type]=='debit'} || "
-      statement += "#{money_format(item[:balance])}"
-      statement_body << statement
-    end
-    statement_body.join('\n')
-  end
-
-  def money_format(amount)
-    sprintf('%.2f', amount)
   end
 
 end

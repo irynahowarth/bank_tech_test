@@ -1,6 +1,7 @@
 require 'transaction'
 
 describe Transaction do
+
   let(:amount100){100}
   let(:balance1000){1000}
   subject(:deposit_trans){described_class.new(:credit,amount100, balance1000)}
