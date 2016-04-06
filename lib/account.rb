@@ -2,18 +2,18 @@ class Account
   attr_reader :balance, :transactions
 
   def initialize(balance=0)
-    @transactions = []
+    @transactions = Array.new
     @balance = balance
   end
 
   def make_deposit(amount)
-    record_transaction('credit',amount)
+    create_transaction(:credit, amount, action_name = Transaction)
   end
 
   def make_withdraw(amount)
     message = 'Balance is lower than withdrawing amount'
     fail message if balance-amount<0
-    record_transaction('debit',amount)
+    create_transaction(:debit, amount, action_name = Transaction)
   end
 
   def print_statement
@@ -24,19 +24,15 @@ class Account
 
   private
 
-  def record_transaction(type, amount)
-    type == 'credit'? change_balance(amount) : change_balance(-amount)
-    transaction = {
-      type: type,
-      amount: amount,
-      date: Time.now.strftime("%x %H:%m"),
-      balance: @balance
-    }
-    @transactions.insert(0,transaction)
+  def create_transaction(type, amount, action_name)
+    transaction = action_name.new(type, amount, balance)
+    transaction.make
+    @balance = transaction.balance
+    record_transaction(transaction)
   end
 
-  def change_balance(amount)
-    @balance += amount
+  def record_transaction(transaction)
+    @transactions.insert(0,transaction)
   end
 
   def statement_body_output
